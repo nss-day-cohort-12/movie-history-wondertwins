@@ -1,6 +1,25 @@
 "use strict";
 
 let MovieHistory = angular.module("MovieApp", ["ngRoute", "firebase"])
+  // define my personal firebase URL as a constant to be referenced later as firebaseURL
+  .constant('firebaseURL', "https://nssmoviesapp.firebaseio.com")
+
+/*
+This directive allows us to pass a function in on an enter key to do what we want.
+ */
+.directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngEnter);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
+});
 
 /*
   Define a promise for any view that needs an authenticated user
@@ -28,14 +47,14 @@ MovieHistory.config(["$routeProvider",
       //   controller: "SongCtrl",
       //   resolve: { isAuth }
       // }).
-      when("/watched", {
-        templateUrl: "partials/watched.html",
-        controller: "WatchedCtrl",
-        resolve: { isAuth }
-      }).
-      when("/unwatched", {
-        templateUrl: "partials/unwatched.html",
-        controller: "UnwatchedCtrl",
+      // when("/watched", {
+      //   templateUrl: "partials/watched.html",
+      //   controller: "WatchedCtrl",
+      //   resolve: { isAuth }
+      // }).
+      when("/movies", {
+        templateUrl: "partials/movies.html",
+        controller: "MoviesCtrl",
         resolve: { isAuth }
       }).
       when("/login", {
@@ -57,7 +76,7 @@ MovieHistory.config(["$routeProvider",
       //   resolve: { isAuth }
       // }).
       otherwise({
-        redirectTo: "/unwatched"
+        redirectTo: "/movies"
       });
   }]);
 
@@ -70,7 +89,7 @@ MovieHistory.run([
   "$location",
 
   ($location) => {
-    let movieHistoryRef = new Firebase("https://wonder-twins.firebaseio.com");
+    let movieHistoryRef = new Firebase("https://nssmoviesapp.firebaseio.com");
 
     movieHistoryRef.onAuth(authData => {
       if (!authData) {
@@ -79,3 +98,5 @@ MovieHistory.run([
     });
   }
 ]);
+
+
